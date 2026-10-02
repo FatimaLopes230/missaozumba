@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MISSÃO: Ao Ritmo de Zumba - Divisores de 42</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-bg: #eff6ff;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --slate-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --radius: 16px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    body {
+      background-color: var(--slate-bg);
+      color: var(--text-dark);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      color: white;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .app-title { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .badge-total { background: rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .tab-btn {
+      background: #e2e8f0;
+      border: 2px solid transparent;
+      padding: 10px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    .tab-btn .tab-num { font-size: 0.8rem; font-weight: bold; display: block; }
+    .tab-btn .tab-label { font-size: 0.9rem; font-weight: 700; }
+
+    .tab-btn.active {
+      background: var(--primary-bg);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e2e8f0;
+    }
+
+    .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .step-badge { background: #e0f2fe; color: #0369a1; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; }
+    .step-subtitle { font-size: 0.85rem; color: var(--text-muted); }
+    .step-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .step-description { color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+
+    .flowchart-section {
+      background: #f1f5f9;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .flow-tree { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .flow-node { padding: 8px 16px; border-radius: 20px; font-weight: bold; text-align: center; font-size: 0.85rem; border: 2px solid transparent; }
+    .node-root { background: #eff6ff; border-color: #93c5fd; color: var(--primary); font-size: 0.95rem; }
+
+    .flow-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+    .branch { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.35; }
+    .branch.active { opacity: 1; transform: scale(1.02); }
+
+    .node-exact { background: var(--success-bg); border-color: var(--success-border); color: #15803d; }
+    .node-non-exact { background: var(--danger-bg); border-color: var(--danger-border); color: #b91c1c; }
+    .node-box { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; width: 100%; text-align: center; font-size: 0.8rem; }
+
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .comp-box { border: 2px solid; border-radius: 12px; padding: 12px; text-align: center; background: white; }
+    .comp-box.exact { border-color: var(--success-border); color: #15803d; }
+    .comp-box.non-exact { border-color: var(--danger-border); color: #b91c1c; }
+    .comp-box .title { font-size: 0.85rem; font-weight: 700; }
+    .comp-box .operation { font-size: 1.15rem; font-weight: 800; }
+
+    .lab-section { background: #f8fafc; border-radius: 14px; padding: 18px; border: 1px solid #e2e8f0; }
+    .buttons-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+    .group-btn { background: white; border: 1.5px solid #cbd5e1; padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .group-btn.selected { background: #047857; color: white; border-color: #047857; }
+
+    .result-banner { background: white; border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--success); margin-bottom: 16px; }
+    .math-tag { background: #dcfce7; color: #15803d; font-weight: 800; padding: 6px 12px; border-radius: 16px; }
+
+    .rows-container { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .row-line { display: flex; align-items: center; gap: 10px; background: #f1f5f9; padding: 8px 12px; border-radius: 8px; }
+    .row-label { font-size: 0.8rem; font-weight: bold; width: 65px; color: var(--text-muted); }
+    .students-flex { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+    
+    .student-avatar {
+      width: 28px;
+      height: 28px;
+      background: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .student-avatar.leftover {
+      background: #ef4444;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <header>
+      <h1 class="app-title">💃 MISSÃO: Ao Ritmo de Zumba - Divisores de 42 🎵</h1>
+      <div class="badge-total">Turma: 42 Alunos 🕺</div>
+    </header>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="mudarTab(1)"><span class="tab-num">01 🗺️</span><span class="tab-label">Mapa</span></button>
+      <button class="tab-btn" onclick="mudarTab(2)"><span class="tab-num">02 ✍️</span><span class="tab-label">Regra</span></button>
+      <button class="tab-btn" onclick="mudarTab(3)"><span class="tab-num">03 🤝</span><span class="tab-label">Pares</span></button>
+      <button class="tab-btn" onclick="mudarTab(4)"><span class="tab-num">04 ⚡</span><span class="tab-label">Poderes</span></button>
+      <button class="tab-btn" onclick="mudarTab(5)"><span class="tab-num">05 🔐</span><span class="tab-label">Código</span></button>
+    </div>
+
+    <div id="tab-1" class="tab-content active">
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">PASSO 1 DE 5</span>
+          <span class="step-subtitle">Organização dos 42 alunos na pista de dança</span>
+        </div>
+
+        <h2 class="step-title">🗺️ O Mapa da Nossa Descoberta</h2>
+        <p class="step-description">
+          Na aula de Zumba, precisamos organizar 42 alunos em filas com o mesmo número de pessoas. Testamos a divisão: quando o resto é igual a 0, a divisão é exata e a dança começa sem ninguém de fora!
+        </p>
+
+        <div class="flowchart-section">
+          <div class="flow-tree">
+            <div class="flow-node node-root">💃 42 ALUNOS NA AULA DE ZUMBA 🕺</div>
+            <div style="font-size:0.8rem; color:#64748b;">↓</div>
+            <div class="flow-branches">
+              <div class="branch" id="branch-exact">
+                <div class="flow-node node-exact">🟢 DIVISÃO EXATA (Resto = 0)</div>
+                <div class="node-box">Filas completas sem sobras! 🎉</div>
+                <div class="flow-node node-exact">✅ SÃO DIVISORES DE 42</div>
+              </div>
+              <div class="branch" id="branch-non-exact">
+                <div class="flow-node node-non-exact">🔴 DIVISÃO NÃO EXATA (Resto ≠ 0)</div>
+                <div class="node-box">Filas incompletas (sobram alunos) 🎧</div>
+                <div class="flow-node node-non-exact">❌ NÃO SÃO DIVISORES DE 42</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="comp-box exact">
+            <div class="title">🟢 Divisão Exata</div>
+            <div class="operation">42 ÷ 6 = 7</div>
+            <div style="font-size:0.8rem;">Resto = 0 (Filas perfeitas!)</div>
+          </div>
+          <div class="comp-box non-exact">
+            <div class="title">🔴 Divisão Não Exata</div>
+            <div class="operation">42 ÷ 5 = 8</div>
+            <div style="font-size:0.8rem;">Resto = 2 (Sobram 2 alunos!)</div>
+          </div>
+        </div>
+
+        <div class="lab-section">
+          <h3 style="font-size:1rem; margin-bottom:10px;">🧪 Laboratório de Formação de Filas</h3>
+          
+          <div class="buttons-scroll">
+            <button class="group-btn" onclick="testarGrupo(1, this)">Filas de 1</button>
+            <button class="group-btn" onclick="testarGrupo(2, this)">Filas de 2</button>
+            <button class="group-btn" onclick="testarGrupo(3, this)">Filas de 3</button>
+            <button class="group-btn" onclick="testarGrupo(4, this)">Filas de 4</button>
+            <button class="group-btn" onclick="testarGrupo(5, this)">Filas de 5</button>
+            <button class="group-btn selected" onclick="testarGrupo(6, this)">Filas de 6</button>
+            <button class="group-btn" onclick="testarGrupo(7, this)">Filas de 7</button>
+          </div>
+
+          <div class="result-banner" id="result-banner">
+            <div>
+              <div id="res-text" style="font-weight:700; font-size:0.95rem;">🎉 Divisão Exata! (6 é divisor)</div>
+              <div id="res-sub" style="font-size:0.85rem; color:#64748b;">42 ÷ 6 = 7 filas (Resto = 0).</div>
+            </div>
+            <div class="math-tag" id="math-tag">6 ∈ D42</div>
+          </div>
+
+          <div class="rows-container" id="rowsContainer"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="tab-2" class="tab-content">
+      <div class="step-card">
+        <span class="step-badge">PASSO 2 DE 5</span>
+        <h2 class="step-title" style="margin-top:10px;">02 • Regra Formal</h2>
+        <p class="step-description">
+          Um número natural <i>a</i> é divisor de um número natural <i>b</i> quando a divisão de <i>b</i> por <i>a</i> (<i>b</i> ÷ <i>a</i>) é exata (ou seja, quando o resto é igual a 0).
+        </p>
+      </div>
+    </div>
+
+    <div id="tab-3" class="tab-content">
+      <div class="step-card">
+        <span class="step-badge">PASSO 3 DE 5</span>
+        <h2 class="step-title" style="margin-top:10px;">03 • Pares Multiplicativos</h2>
+        <p class="step-description">
+          Os divisores organizam-se sempre em pares: (1, 42), (2, 21), (3, 14) e (6, 7).
+        </p>
+      </div>
+    </div>
+
+    <div id="tab-4" class="tab-content">
+      <div class="step-card">
+        <span class="step-badge">PASSO 4 DE 5</span>
+        <h2 class="step-title" style="margin-top:10px;">04 • Os Poderes dos Divisores</h2>
+        <p class="step-description">
+          1. 🥇 O MENOR divisor de qualquer número é 1.<br>
+          2. 👑 O MAIOR divisor de qualquer número (diferente de zero) é ele próprio (42).<br>
+          3. 🏁 O conjunto dos divisores é finito.
+        </p>
+      </div>
+    </div>
+
+    <div id="tab-5" class="tab-content">
+      <div class="step-card">
+        <span class="step-badge">PASSO 5 DE 5</span>
+        <h2 class="step-title" style="margin-top:10px;">05 • O Código Final</h2>
+        <p class="step-description" style="font-size:1.25rem; font-weight:bold; color:var(--primary);">
+          🔐 D42 = {1, 2, 3, 6, 7, 14, 21, 42}
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const emojisDancarios = ['💃', '🕺', '🏃‍♀️', '🏃'];
+
+    function mudarTab(passo) {
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => btn.classList.toggle('active', idx === passo - 1));
+      document.querySelectorAll('.tab-content').forEach((content, idx) => content.classList.toggle('active', idx === passo - 1));
+    }
+
+    function testarGrupo(n, el) {
+      document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('selected'));
+      if(el) el.classList.add('selected');
+
+      const total = 42;
+      const cociente = Math.floor(total / n);
+      const resto = total % n;
+      const eDivisor = (resto === 0);
+
+      document.getElementById('branch-exact').classList.toggle('active', eDivisor);
+      document.getElementById('branch-non-exact').classList.toggle('active', !eDivisor);
+
+      const banner = document.getElementById('result-banner');
+      const text = document.getElementById('res-text');
+      const sub = document.getElementById('res-sub');
+      const tag = document.getElementById('math-tag');
+
+      if (eDivisor) {
+        banner.style.borderLeftColor = 'var(--success)';
+        text.innerText = `🎉 Divisão Exata! (${n} é divisor)`;
+        sub.innerText = `42 ÷ ${n} = ${cociente} filas (Resto = 0). Par: ${n} × ${cociente} = 42.`;
+        tag.innerText = `${n} ∈ D42`;
+        tag.style.background = '#dcfce7';
+        tag.style.color = '#15803d';
+      } else {
+        banner.style.borderLeftColor = 'var(--danger)';
+        text.innerText = `⚠ Divisão Não Exata! (${n} NÃO é divisor)`;
+        sub.innerText = `42 ÷ ${n} = ${cociente} filas (Resto = ${resto}). Sobram ${resto} aluno(s).`;
+        tag.innerText = `${n} ∉ D42`;
+        tag.style.background = '#fee2e2';
+        tag.style.color = '#b91c1c';
+      }
+
+      const container = document.getElementById('rowsContainer');
+      container.innerHTML = '';
+
+      for (let f = 1; f <= cociente; f++) {
+        const row = document.createElement('div');
+        row.className = 'row-line';
+        row.innerHTML = `<div class="row-label">Fila ${f}</div><div class="students-flex"></div>`;
+        const flex = row.querySelector('.students-flex');
+        
+        for (let a = 0; a < n; a++) {
+          const emoji = emojisDancarios[(f + a) % emojisDancarios.length];
+          flex.innerHTML += `<div class="student-avatar" title="Aluno de Zumba">${emoji}</div>`;
+        }
+        container.appendChild(row);
+      }
+
+      if (resto > 0) {
+        const row = document.createElement('div');
+        row.className = 'row-line';
+        row.style.background = 'var(--danger-bg)';
+        row.style.border = '1px dashed var(--danger-border)';
+        row.innerHTML = `<div class="row-label" style="color:var(--danger)">Sobras 🎧</div><div class="students-flex"></div>`;
+        const flex = row.querySelector('.students-flex');
+        for (let r = 0; r < resto; r++) {
+          flex.innerHTML += `<div class="student-avatar leftover" title="Aluno fora da fila!">🎧</div>`;
+        }
+        container.appendChild(row);
+      }
+    }
+
+    testarGrupo(6, null);
+  </script>
+
+</body>
+</html>
